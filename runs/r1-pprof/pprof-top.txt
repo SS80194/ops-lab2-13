@@ -1,0 +1,48 @@
+File: enrolld
+Build ID: 0bde9eed8a74b4c2cdb1dadfda8dae01951b8d07
+Type: cpu
+Time: 2026-10-29 16:23:56 CST
+Duration: 20s, Total samples = 2.57s (12.85%)
+Showing nodes accounting for 2.47s, 96.11% of 2.57s total
+Dropped 37 nodes (cum <= 0.01s)
+      flat  flat%   sum%        cum   cum%
+     2.33s 90.66% 90.66%      2.33s 90.66%  main.spin (inline)
+     0.11s  4.28% 94.94%      0.11s  4.28%  internal/runtime/syscall/linux.Syscall6
+     0.01s  0.39% 95.33%      0.04s  1.56%  internal/poll.(*FD).Read
+     0.01s  0.39% 95.72%      2.51s 97.67%  net/http.(*conn).serve
+     0.01s  0.39% 96.11%      0.05s  1.95%  net/http.checkConnErrorWriter.Write
+         0     0% 96.11%      0.03s  1.17%  bufio.(*Reader).Peek
+         0     0% 96.11%      0.03s  1.17%  bufio.(*Reader).fill
+         0     0% 96.11%      0.05s  1.95%  bufio.(*Writer).Flush
+         0     0% 96.11%      0.02s  0.78%  internal/poll.(*FD).SetReadDeadline (inline)
+         0     0% 96.11%      0.04s  1.56%  internal/poll.(*FD).Write
+         0     0% 96.11%      0.07s  2.72%  internal/poll.ignoringEINTRIO (inline)
+         0     0% 96.11%      0.02s  0.78%  internal/poll.runtime_pollSetDeadline
+         0     0% 96.11%      0.02s  0.78%  internal/poll.setDeadlineImpl
+         0     0% 96.11%      0.04s  1.56%  internal/runtime/syscall/linux.EpollWait
+         0     0% 96.11%      2.35s 91.44%  main.(*server).handleCourse
+         0     0% 96.11%      2.35s 91.44%  main.(*server).instrument.func1
+         0     0% 96.11%      0.04s  1.56%  net.(*conn).Read
+         0     0% 96.11%      0.02s  0.78%  net.(*conn).SetReadDeadline
+         0     0% 96.11%      0.04s  1.56%  net.(*conn).Write
+         0     0% 96.11%      0.04s  1.56%  net.(*netFD).Read
+         0     0% 96.11%      0.02s  0.78%  net.(*netFD).SetReadDeadline (inline)
+         0     0% 96.11%      0.04s  1.56%  net.(*netFD).Write
+         0     0% 96.11%      2.36s 91.83%  net/http.(*ServeMux).ServeHTTP
+         0     0% 96.11%      0.03s  1.17%  net/http.(*conn).readRequest
+         0     0% 96.11%      0.03s  1.17%  net/http.(*connReader).Read
+         0     0% 96.11%      0.02s  0.78%  net/http.(*connReader).backgroundRead
+         0     0% 96.11%      0.06s  2.33%  net/http.(*response).finishRequest
+         0     0% 96.11%      2.35s 91.44%  net/http.HandlerFunc.ServeHTTP
+         0     0% 96.11%      2.36s 91.83%  net/http.serverHandler.ServeHTTP
+         0     0% 96.11%      0.04s  1.56%  runtime.findRunnable
+         0     0% 96.11%      0.04s  1.56%  runtime.mcall
+         0     0% 96.11%      0.04s  1.56%  runtime.netpoll
+         0     0% 96.11%      0.04s  1.56%  runtime.park_m
+         0     0% 96.11%      0.04s  1.56%  runtime.schedule
+         0     0% 96.11%      0.07s  2.72%  syscall.RawSyscall6
+         0     0% 96.11%      0.03s  1.17%  syscall.Read (inline)
+         0     0% 96.11%      0.07s  2.72%  syscall.Syscall
+         0     0% 96.11%      0.04s  1.56%  syscall.Write (inline)
+         0     0% 96.11%      0.03s  1.17%  syscall.read
+         0     0% 96.11%      0.04s  1.56%  syscall.write
