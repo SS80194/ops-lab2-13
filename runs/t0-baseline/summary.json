@@ -1,0 +1,168 @@
+{
+ "windows": {
+  "T0": 1793252096,
+  "T1": 1793252108,
+  "T2": 1793252114,
+  "T3": 1793252126
+ },
+ "vmstat": {
+  "r": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "b": {
+   "idle": 0.0,
+   "load": 1.0
+  },
+  "swpd": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "free": {
+   "idle": 69256.0,
+   "load": 66020.0
+  },
+  "buff": {
+   "idle": 78436.0,
+   "load": 86716.0
+  },
+  "cache": {
+   "idle": 1227652.0,
+   "load": 1228152.0
+  },
+  "si": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "so": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "bi": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "bo": {
+   "idle": 0.0,
+   "load": 13972.0
+  },
+  "in": {
+   "idle": 1203.0,
+   "load": 9771.0
+  },
+  "cs": {
+   "idle": 1668.0,
+   "load": 20378.0
+  },
+  "us": {
+   "idle": 1.0,
+   "load": 0.0
+  },
+  "sy": {
+   "idle": 1.0,
+   "load": 3.0
+  },
+  "id": {
+   "idle": 99.0,
+   "load": 50.0
+  },
+  "wa": {
+   "idle": 0.0,
+   "load": 47.0
+  },
+  "st": {
+   "idle": 0.0,
+   "load": 0.0
+  }
+ },
+ "iostat": {
+  "r/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "rkB/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "rrqm/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "%rrqm": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "r_await": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "rareq-sz": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "w/s": {
+   "idle": 0.0,
+   "load": 2559.0
+  },
+  "wkB/s": {
+   "idle": 0.0,
+   "load": 13984.0
+  },
+  "wrqm/s": {
+   "idle": 0.0,
+   "load": 939.0
+  },
+  "%wrqm": {
+   "idle": 0.0,
+   "load": 26.76
+  },
+  "w_await": {
+   "idle": 0.0,
+   "load": 0.38
+  },
+  "wareq-sz": {
+   "idle": 0.0,
+   "load": 5.49
+  },
+  "d/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "dkB/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "drqm/s": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "%drqm": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "d_await": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "dareq-sz": {
+   "idle": 0.0,
+   "load": 0.0
+  },
+  "f/s": {
+   "idle": 0.0,
+   "load": 1698.0
+  },
+  "f_await": {
+   "idle": 0.0,
+   "load": 0.03
+  },
+  "aqu-sz": {
+   "idle": 0.0,
+   "load": 1.02
+  },
+  "%util": {
+   "idle": 0.0,
+   "load": 100.0
+  }
+ }
+}
