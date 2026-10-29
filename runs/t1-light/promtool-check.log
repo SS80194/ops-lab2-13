@@ -1,0 +1,3 @@
+Checking deploy/prometheus.yml
+ SUCCESS: deploy/prometheus.yml is valid prometheus config file syntax
+

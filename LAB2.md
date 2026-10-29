@@ -96,7 +96,7 @@ GEN_CPUS=0 scripts/run.sh t1-light -url http://127.0.0.1:8080/api/courses/1 -rat
 - `vmstat.log`、`mpstat.log`、`iostat.log`、`pidstat.log` 均有连续原始输出。自动核对结果见 `validation.json`、`validation.log`；核对脚本是 `verify.py`。
 - 空载没有请求时比率/延迟为空或 NaN；纯读测试的 fsync 平均耗时等为 NaN，属于没有对应事件，不是采集失败。
 
-启动、SSH 隧道访问、复测和停止命令见 `docs/task1-operations.md`。本次仅完成任务 1；任务 0 和任务 2 以后的预测、实验与结论保留待完成。
+启动、SSH 隧道访问、复测和停止命令见 `docs/task1-operations.md`。本 PR 完成任务 1；任务 0 基线已由主分支补齐，任务 2 以后的预测、实验与结论保留待完成。
 
 ## 4. 任务 2：读路径
 

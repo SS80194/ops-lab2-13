@@ -36,9 +36,11 @@ scripts/get-tools.sh   # 下载并校验 Prometheus 3.13.4、node_exporter 1.12.
 | `cmd/promsteps/` | 按 loadgen 的阶段查询 Prometheus，输出“阶段 × 查询”的表 |
 | `internal/metrics/` | 仅用标准库输出 Prometheus 文本格式的指标，建议阅读 |
 | `deploy/prometheus.yml` | Prometheus 配置 |
-| `deploy/queries-red.txt`、`deploy/queries-use.txt` | 服务层和资源层的查询；前者有四行 TODO 需自行编写 |
+| `deploy/queries-red.txt`、`deploy/queries-use.txt` | 服务层和资源层的查询；前者已补齐任务 1 的四条查询 |
 | `scripts/run.sh` | 运行一次实验：加压并同时采集资源数据，结束后查询 Prometheus，结果存入 `runs/<名字>/` |
 | `scripts/requery.sh` | 修改查询文件后，对已完成的实验重新查询 |
 | `scripts/rates.sh`、`scripts/table.sh` | 生成各阶段的到达率；将一次实验的数据整理为 Markdown 表格 |
 | `scripts/get-tools.sh` | 下载 Prometheus 和 node_exporter |
 | `LAB2.md` | 小组的数据与分析记录，需要填写并提交 |
+| `docs/task1-operations.md` | 任务 1 的云主机部署、访问、复测和停止命令 |
+| `runs/t1-light/` | 已完成的低负载实验原始数据、查询快照与验收结果 |
