@@ -1,0 +1,37 @@
+steps fields: step, target_rps, start_unix, end_unix, start_local, sent, ok, http_err, timeout, net_err, dropped, ok_rps, error_rate, mean_ms, p50_ms, p90_ms, p99_ms, max_ms, slo_good, lag_p99_ms, gen_cpu_pct, codes, warn
+red fields: step, target_rps, server_rps, server_error_rate, server_p99_ms, server_mean_ms, inflight_avg, cpu_cores, cpu_ms_per_req, cpu_wait_threads, sched_wait_p99_ms, pool_in_use_avg, pool_wait_p99_ms, db_query_mean_ms, fsync_per_s, fsync_mean_ms, fsync_p99_ms, batch_mean, goroutines_max, server_slo_good
+use fields: step, target_rps, svc_cpu_busy, all_cpu_busy, cpu_steal, cpu_iowait, procs_running_avg, cpu_psi_some, mem_available_min_mb, swap_in_per_s, disk_w_per_s, disk_wkb_per_s, disk_w_await_ms, disk_f_per_s, disk_f_await_ms, disk_aqu_sz, disk_util
+{
+  "targets": {
+    "enrolld": "up",
+    "node": "up"
+  },
+  "loaded_stages": [
+    {
+      "step": "2",
+      "target_rps": "50",
+      "server_rps": 51.5833,
+      "server_error_rate": 0.0,
+      "server_p99_ms": 19.9,
+      "server_slo_good": 1.0,
+      "cpu_ms_per_req": 0.553748,
+      "db_query_mean_ms": 10.3004
+    },
+    {
+      "step": "3",
+      "target_rps": "100",
+      "server_rps": 95.4167,
+      "server_error_rate": 0.0,
+      "server_p99_ms": 19.9043,
+      "server_slo_good": 1.0,
+      "cpu_ms_per_req": 0.533471,
+      "db_query_mean_ms": 10.4232
+    }
+  ],
+  "request_counter_delta": 4451.0,
+  "client_sent_total": 4451,
+  "continuous_up_samples": {
+    "enrolld": 18,
+    "node": 18
+  }
+}

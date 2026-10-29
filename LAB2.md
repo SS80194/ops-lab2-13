@@ -9,14 +9,16 @@
 | 项 | 内容 |
 |---|---|
 | 小组 | 第 <组号> 组 |
-| 仓库地址 | <https://github.com/…> |
-| 主机 | <云厂商与规格名，例如某云的 2 vCPU 4 GB 通用型；或学校的虚拟机> |
-| CPU | <`lscpu` 的 Model name；vCPU 数；`lscpu -e` 里每个 CPU 对应的 CORE> |
-| 内存 | <`free -m` 的 total> |
-| 数据目录所在的盘 | <`findmnt -T data` 的 SOURCE 和 FSTYPE；磁盘类型，如“通用型 SSD 云盘 40 GB”> |
-| 操作系统与内核 | <`/etc/os-release` 的 PRETTY_NAME；`uname -r`> |
-| Go、Prometheus、node_exporter | <`go version`；`tools/prometheus --version` 第一行；`tools/node_exporter --version` 第一行> |
-| 分核 | enrolld：<如 1>；loadgen、Prometheus、node_exporter：<如 0> |
+| 仓库地址 | <https://github.com/SS80194/ops-lab2-13> |
+| 主机 | 华为云 ECS；来宾系统可见 2 vCPU、1771 MiB 内存；控制台规格名未查询 |
+| CPU | General Purpose Processor；2 vCPU；CPU 0、1 均对应 CORE 0（虚拟机暴露的拓扑） |
+| 内存 | 1771 MiB |
+| 数据目录所在的盘 | `/dev/vda1`，ext4；所在整盘 `vda` 40 GiB；云盘产品类型未查询 |
+| 操作系统与内核 | Ubuntu 22.04.5 LTS；5.15.0-186-generic |
+| Go、Prometheus、node_exporter | go1.26.10 linux/amd64；Prometheus 3.13.4；node_exporter 1.12.1 |
+| 分核 | enrolld：CPU 1；loadgen、Prometheus、node_exporter：CPU 0 |
+
+以上环境信息的原始输出见 `runs/t1-light/environment.txt` 和 `meta.txt`。两逻辑 CPU 共享同一 CORE，分核后仍可能有物理资源干扰。小组编号保留待组员确认。
 
 ## 2. 任务 0：基线
 
@@ -42,22 +44,46 @@
 
 ## 3. 任务 1：指标流水线
 
-两个抓取目标的状态（`curl -s 127.0.0.1:9090/api/v1/targets` 中两处 `"health"` 的值）：<填写>
+两个抓取目标的状态：`enrolld=up`、`node=up`，`lastError` 均为空。原始 API 响应见 `runs/t1-light/targets.json`；测试区间每 5 秒查询 `up`，两个目标各 18 个采样点全部为 1（`runs/t1-light/up-range.json`）。
 
 本组编写的四条查询（与 `deploy/queries-red.txt` 一致）：
 
 ```text
-server_rps          <填写>
-server_error_rate   <填写>
-server_p99_ms       <填写>
-server_slo_good     <填写>
+server_rps          sum(rate(http_requests_total{route="${route}"}[${window}]))
+server_error_rate   (sum(rate(http_requests_total{route="${route}",code=~"5.."}[${window}])) or vector(0)) / sum(rate(http_requests_total{route="${route}"}[${window}]))
+server_p99_ms       1000 * histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket{route="${route}"}[${window}])))
+server_slo_good     (sum(rate(http_request_duration_seconds_bucket{route="${route}",code="200",le="${slo}"}[${window}])) or vector(0)) / sum(rate(http_requests_total{route="${route}"}[${window}]))
 ```
 
 `runs/t1-light` 的数据（`scripts/table.sh runs/t1-light ok_rps mean_ms p99_ms server_rps server_mean_ms server_p99_ms cpu_ms_per_req db_query_mean_ms`）：
 
-<粘贴表格>
+| step | target_rps | ok_rps | mean_ms | p99_ms | server_rps | server_mean_ms | server_p99_ms | cpu_ms_per_req | db_query_mean_ms |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0 | 0.0 | - | - | - | - | - | - | NaN |
+| 2 | 50 | 50.5 | 11.48 | 12.91 | 51.5833 | 10.7481 | 19.9 | 0.553748 | 10.3004 |
+| 3 | 100 | 97.8 | 11.60 | 14.57 | 95.4167 | 10.9031 | 19.9043 | 0.533471 | 10.4232 |
+| all | - | 74.2 | 11.56 | 14.12 | - | - | - | - | - |
 
-从这次实验读出：每次查询实际占用连接 <填写> ms（`db_query_mean_ms`）；每个请求消耗的 CPU <填写> ms（`cpu_ms_per_req`，取 100 请求/秒的阶段）。
+从这次实验读出：每次查询实际占用连接 **10.4232 ms**；每个请求消耗的 CPU **0.533471 ms**。均取 `runs/t1-light/red.csv` 第 3 阶段（目标 100 请求/秒）的 `db_query_mean_ms`、`cpu_ms_per_req`。50 请求/秒阶段的连接占用为 10.3004 ms。
+
+
+本次运行于 **2026-10-29 13:26:11–13:27:41（UTC+8）**，执行：
+
+```bash
+GEN_CPUS=0 scripts/run.sh t1-light -url http://127.0.0.1:8080/api/courses/1 -rates 0,50,100 -step 30s
+```
+
+服务参数为 `-work 200000 -pool 4 -db-ms 10 -sync each`，详见 `meta.txt`。验收结果：
+
+- `steps.csv` 共 4451 个请求全部成功；HTTP 错误、超时、网络错误、丢请求均为 0，无压测器警告。
+- `metrics-end.txt` 相比 `metrics-start.txt` 的读接口请求计数增量也是 4451，与客户端完全一致。
+- 两个有效负载阶段四条新查询均返回有限数值，5xx 比例为 0，服务端 50 ms SLI 为 1。
+- 第 3 阶段客户端实际吞吐 97.8 请求/秒，p99 14.57 ms；服务端吞吐 95.4167 请求/秒，p99 19.9043 ms。到达过程随机，客户端统计完整 30 秒，Prometheus 查询后 25 秒；服务端 p99 使用直方图桶插值，因此不能要求逐值相等。
+- 第 3 阶段服务 CPU 忙碌比例 0.052（5.2%），最少可用内存 1124.47 MiB（`use.csv`），没有达到资源饱和。
+- `vmstat.log`、`mpstat.log`、`iostat.log`、`pidstat.log` 均有连续原始输出。自动核对结果见 `validation.json`、`validation.log`；核对脚本是 `verify.py`。
+- 空载没有请求时比率/延迟为空或 NaN；纯读测试的 fsync 平均耗时等为 NaN，属于没有对应事件，不是采集失败。
+
+启动、SSH 隧道访问、复测和停止命令见 `docs/task1-operations.md`。本次仅完成任务 1；任务 0 和任务 2 以后的预测、实验与结论保留待完成。
 
 ## 4. 任务 2：读路径
 
