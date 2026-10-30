@@ -1,0 +1,24 @@
+# 实例元数据采集 169.254.169.254  2026-10-30 21:53:20 CST
+instance-type: x1.2u.2g
+availability-zone: cn-east-3c
+instance-id: i-0306f144
+local-hostname: ecs-e0ca.novalocal
+# meta_data.json 关键字段
+"image_name":"Ubuntu 22.04 server 64bit"
+"metering.resourcespeccode":"x1.2u.2g.linux"
+"metering.imagetype":"gold"}
+"region_id":"cn-east-3"
+"instance_type":"x1.2u.2g"
+# 块设备
+NAME  ROTA   SIZE TYPE
+loop0    1  63.8M loop
+loop1    1  79.9M loop
+loop2    1    62M loop
+loop3    1  44.7M loop
+loop4    1    74M loop
+loop5    1 115.2M loop
+vda      1    40G disk
+serial: a301d545-fa2a-4081-8
+by-dname: /dev/vda
+discard_max_bytes: 0
+write_cache: write back

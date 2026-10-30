@@ -10,15 +10,15 @@
 |---|---|
 | 小组 | 第 13 组 |
 | 仓库地址 | <https://github.com/SS80194/ops-lab2-13> |
-| 主机 | 华为云 ECS（KVM 虚拟化）；来宾系统可见 2 vCPU、1771 MiB 内存；控制台规格名未查询 |
+| 主机 | 华为云 ECS（KVM 虚拟化），规格 `x1.2u.2g`：2 vCPU / 2 GiB；可用区 `cn-east-3c`（华东-上海一） |
 | CPU | General Purpose Processor；2 vCPU；`lscpu -e` 中 CPU 0、1 均对应 CORE 0（同一物理核的两个超线程，虚拟机暴露的拓扑） |
-| 内存 | `free -m` total 1771 MiB，无 swap |
-| 数据目录所在的盘 | `/dev/vda1`，ext4，整盘 `vda` 40 GiB，挂在 `/`；`data/` 在真实块设备上（非 tmpfs）；云盘产品类型未查询 |
+| 内存 | 标称 2 GiB（规格名中的 `2g`）；`free -m` 可见 1771 MiB，差额为内核与虚拟化预留；无 swap |
+| 数据目录所在的盘 | `/dev/vda1`，ext4，40 GiB 通用型 SSD 云盘（EVS，virtio 块设备），挂在 `/`；`data/` 在真实块设备上（非 tmpfs） |
 | 操作系统与内核 | Ubuntu 22.04.5 LTS；5.15.0-186-generic |
 | Go、Prometheus、node_exporter | go1.26.10 linux/amd64；Prometheus 3.13.4；node_exporter 1.12.1 |
 | 分核 | enrolld：CPU 1；loadgen、Prometheus、node_exporter：CPU 0 |
 
-以上环境信息的原始输出见 `runs/t0-baseline/host.txt`（任务 0 采集）和 `runs/t1-light/environment.txt`、`meta.txt`。两逻辑 CPU 共享同一 CORE，分核后仍可能有物理资源干扰。小组编号取自仓库名 `ops-lab2-13`。
+以上环境信息的原始输出见 `runs/t0-baseline/host.txt` 与 `runs/t0-baseline/metadata.txt`（实例规格、可用区取自实例元数据 169.254.169.254），以及 `runs/t1-light/environment.txt`、`meta.txt`。两逻辑 CPU 共享同一 CORE，分核后仍可能有物理资源干扰。小组编号取自仓库名 `ops-lab2-13`。
 
 ## 2. 任务 0：基线
 
@@ -43,17 +43,17 @@ fsync 耗时（毫秒）：mean 1.173  p50 1.081  p90 1.391  p99 2.794  max 4.90
 
 按平均值计算，单个写者串行 fsync 每秒最多约 **856** 次（三次 mean 1.169、1.161、1.173 ms，平均 1.168 ms，1000 ÷ 1.168 ≈ 856）。三次之间相差多少？三次平均耗时相差不到 0.012 ms（约 1%）；p99 在 2.188～2.794 ms 之间，max 在 4.907～6.846 ms 之间，单次抖动来自云盘与宿主机，平均值稳定。
 
-空载和运行 fsync 测试时各工具的读数（各观察 5 秒以上，取典型值；空载观察 12 s、负载段为 `bin/enrolld -bench-fsync 5000` 的 5.8 s，均为 1 s 采样的中位数，原始输出见 `runs/t0-baseline/vmstat.log`、`runs/t0-baseline/iostat.log`、`runs/t0-baseline/summary.json`）：
+空载和运行 fsync 测试时各工具的读数（各观察 10 秒以上，取典型值；空载前后各 12 s、负载段为 `bin/enrolld -bench-fsync 10000` 的 11 s，均为 1 s 采样的中位数，原始输出见 `runs/t0-baseline/vmstat.log`、`runs/t0-baseline/iostat.log`、`runs/t0-baseline/summary.json`）：
 
 | 工具与列 | 空载 | 运行 `-bench-fsync` 时 | 该列的含义 |
 |---|---|---|---|
 | `vmstat -w 1`：r、b | r=0，b=0 | r=0，b=1 | r：可运行队列中的进程数；b：阻塞在不可中断睡眠（多为等 I/O）的进程数 |
-| `vmstat -w 1`：us、sy、id、wa、st | us=1，sy=1，id=99，wa=0，st=0 | us=0，sy=3，id=50，wa=47，st=0 | 用户态、内核态、空闲、等 I/O、被宿主机占走的 CPU 时间百分比 |
-| `iostat -dx 1 vda`：w/s、wkB/s | 0、0 | 2559、13984 | 每秒写请求数、每秒写入的 KiB |
-| `iostat -dx 1 vda`：w_await、f/s、f_await | 0、0、0 | 0.38、1698、0.03 | 写请求的平均等待+服务时间（ms）；每秒 flush 次数；flush 的平均耗时（ms） |
+| `vmstat -w 1`：us、sy、id、wa、st | us=1，sy=1，id=99，wa=0，st=0 | us=1，sy=3，id=50，wa=47，st=0 | 用户态、内核态、空闲、等 I/O、被宿主机占走的 CPU 时间百分比 |
+| `iostat -dx 1 vda`：w/s、wkB/s | 0、0 | 2546、13910 | 每秒写请求数、每秒写入的 KiB |
+| `iostat -dx 1 vda`：w_await、f/s、f_await | 0、0、0 | 0.38、1687、0.03 | 写请求的平均等待+服务时间（ms）；每秒 flush 次数；flush 的平均耗时（ms） |
 | `iostat -dx 1 vda`：aqu-sz、%util | 0、0 | 1.02、100 | 平均队列长度（请求数）；设备忙碌时间占比 |
 
-运行 fsync 测试时，CPU 是否繁忙？哪几列表明存在等待？CPU 不繁忙：`us` 为 0、`sy` 为 3、`id` 为 50，约一半时间空闲。等待体现在 `vmstat` 的 `b=1`（有进程阻塞在不可中断睡眠）和 `wa=47`（近一半 CPU 时间在等 I/O），以及 `iostat` 的 `aqu-sz≈1.02`、`%util=100`。按块层计数，每次 fsync 约对应 3 次写（2559 ÷ 863 ≈ 3.0）和 2 次 flush（1698 ÷ 863 ≈ 2.0）；应用量到的 fsync 平均 1.158 ms 远大于块层 `w_await` 0.38 ms，差额是提交日志与设备缓存刷新必须等待的时间。863 次/秒 × 1.158 ms ≈ 100%，与 `%util=100` 一致：串行 fsync 已经把这块盘的写通道占满，而 CPU 仍未饱和。
+运行 fsync 测试时，CPU 是否繁忙？哪几列表明存在等待？这一轮 `-bench-fsync 10000` 的 mean 为 1.186 ms（`runs/t0-baseline/fsync-10000.txt`，即 843 次/秒），与上面三次 2000 次的结果只差约 1.5%，说明基线稳定。CPU 不繁忙：`us` 为 1、`sy` 为 3、`id` 为 50，约一半时间空闲。等待体现在 `vmstat` 的 `b=1`（有进程阻塞在不可中断睡眠）和 `wa=47`（近一半 CPU 时间在等 I/O），以及 `iostat` 的 `aqu-sz≈1.02`、`%util=100`。按块层计数，每次 fsync 约对应 3 次写（2546 ÷ 843 ≈ 3.0）和 2 次 flush（1687 ÷ 843 ≈ 2.0）；应用量到的 fsync 平均 1.186 ms 远大于块层 `w_await` 0.38 ms，差额是提交日志与设备缓存刷新必须等待的时间。843 次/秒 × 1.186 ms ≈ 100%，与 `%util=100` 一致：串行 fsync 已经把这块盘的写通道占满，而 CPU 仍未饱和。
 
 ## 3. 任务 1：指标流水线
 
